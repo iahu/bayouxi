@@ -1,6 +1,6 @@
 import { all } from './db'
 import downloadFile from './download-file'
-import { parallelRun } from './helper'
+import { promisesThrottle } from './helper'
 import loo from './loo'
 
 const [fromIndex = '0'] = process.argv.slice(2)
@@ -18,7 +18,7 @@ const downloadAssets = async (fromIndex = 0): Promise<void> => {
 
   loo.log(`资源下载开始，共${jobs.length}个资源`, jobId)
 
-  parallelRun(jobs, 32, (r, i) => {
+  promisesThrottle(jobs, 32, (r, i) => {
     loo.info(`第${i}个任务结束`)
   })
     .then(() => {

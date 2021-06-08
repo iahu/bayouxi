@@ -53,7 +53,7 @@ export const getDatetime = (): string => {
 }
 
 type Job<T> = () => Promise<T>
-export const parallelRun = async <T>(
+export const promisesThrottle = async <T>(
   jobs: Job<T>[],
   parallelCount: number,
   onParallelDone?: (results: T[], index: number) => void

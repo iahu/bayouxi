@@ -3,9 +3,10 @@ import { getDatetime } from './helper'
 import loo from './loo'
 
 const PRODUCTION = process.env.NODE_ENV === 'production'
+const mainScript = process.argv[1].endsWith('index.ts')
 
 const sqlite3 = verbose()
-const dbName = PRODUCTION ? '233.db' : `233-${getDatetime()}.db`
+const dbName = PRODUCTION || !mainScript ? '233.db' : `233-${getDatetime()}.db`
 const db = new sqlite3.Database(dbName)
 loo.info('use Database from', dbName)
 
@@ -61,7 +62,7 @@ db.serialize(() => {
   )`)
 })
 
-export const get = (sql: string, params: unknown): Promise<RunResult> => {
+export const get = <T extends unknown>(sql: string, params?: unknown): Promise<T> => {
   return new Promise((resolve, reject) => {
     db.get(sql, params, function (err, rows) {
       if (err) {
@@ -72,7 +73,7 @@ export const get = (sql: string, params: unknown): Promise<RunResult> => {
   })
 }
 
-export const all = <T extends unknown>(sql: string, params: unknown): Promise<T[]> => {
+export const all = <T extends unknown>(sql: string, params?: unknown): Promise<T[]> => {
   return new Promise((resolve, reject) => {
     db.all(sql, params, function (err, rows) {
       if (err) {
@@ -83,7 +84,7 @@ export const all = <T extends unknown>(sql: string, params: unknown): Promise<T[
   })
 }
 
-export const run = (sql: string, params: unknown): Promise<RunResult> => {
+export const run = (sql: string, params?: unknown): Promise<RunResult> => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
       if (err) {

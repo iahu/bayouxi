@@ -1,4 +1,4 @@
-import { parallelRun } from './helper'
+import { promisesThrottle } from './helper'
 import getCategory from './category'
 import getPageInfo from './page'
 import loo from './loo'
@@ -37,7 +37,7 @@ const main = async (fromCateIndex: number, fromPageIndex: number) => {
     })
   })
 
-  parallelRun(listJobs, 42).then(() => {
+  promisesThrottle(listJobs, 42).then(() => {
     loo.log('任务结束', jobId, '耗时', Date.now() - jobId)
   })
 }
