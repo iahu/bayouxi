@@ -17,18 +17,12 @@ export const ensureDirectoryExistence = (filePath: string): Promise<string> => {
     .finally(() => (memo[dirname] = 1))
 }
 
-let baseId = 1000000
-export const uuid = (base = 0): number => {
-  baseId = baseId + 1
-  return base + baseId
-}
-
-export const getUuid =
-  (baseId = 0) =>
-  (base = 0): number => {
+export const getUuid = (baseId = 0) => {
+  return (base = 0): number => {
     baseId = baseId + 1
     return base + baseId
   }
+}
 
 export const delay = (ms: number): Promise<number> => {
   return new Promise((resolve) => {
