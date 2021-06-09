@@ -44,7 +44,6 @@ const main = async (fromCateIndex: number, fromPageIndex: number) => {
         },
       })
 
-      console.log('result', result)
       if (result) {
         loo.log('分类结束', `${cateIdx + 1}/${cateLength}`, subCate.cate_name)
       }
