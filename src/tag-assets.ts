@@ -57,9 +57,10 @@ const main = async () => {
       }
       if (result) {
         run('UPDATE assets SET done=1 WHERE id=?', [id])
-      } else {
-        renameToHtml(filename)
       }
+      // else {
+      //   renameToHtml(filename)
+      // }
     } catch (e) {
       // console.log(e)
     }
@@ -106,4 +107,4 @@ const rm = () => {
   })
 }
 
-rm()
+main()

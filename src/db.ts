@@ -3,7 +3,7 @@ import { getDatetime } from './helper'
 import loo from './loo'
 
 const PRODUCTION = process.env.NODE_ENV === 'production'
-const mainScript = process.argv[1].endsWith('index.ts')
+const mainScript = process.argv[1]?.endsWith('index.ts')
 
 const sqlite3 = verbose()
 const dbName = PRODUCTION || !mainScript ? '233.db' : `233-${getDatetime()}.db`
@@ -15,6 +15,7 @@ db.serialize(() => {
   // db.run('DROP TABLE IF EXISTS category_l2', [])
   // db.run('DROP TABLE IF EXISTS game_info', [])
   // db.run('DROP TABLE IF EXISTS assets', [])
+  // db.run('DROP TABLE IF EXISTS comments', [])
 
   db.run(`CREATE TABLE IF NOT EXISTS category (
     id INTEGER PRIMARY KEY,
@@ -46,6 +47,7 @@ db.serialize(() => {
     app_version TEXT,
     app_author TEXT,
     link TEXT,
+    comment INTEGER,
     UNIQUE (id, name)
   )`)
 
@@ -58,7 +60,13 @@ db.serialize(() => {
     alt TEXT,
     title TEXT,
     link TEXT,
-    page_link TEXT
+    page_link TEXT,
+    done INTEGER
+  )`)
+
+  db.run(`CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    comment TEXT
   )`)
 })
 

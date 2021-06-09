@@ -59,6 +59,7 @@ type Page = {
   app_size: string
   app_version: string
   app_author: string
+  comment: number
 }
 
 type Asset = {
@@ -77,6 +78,7 @@ app.get('/game/:id', async (req, res) => {
   const imagesPath = await all<Asset>(`SELECT path, alt, title FROM assets WHERE id IN (${images})`)
   const videosPath = await all<Asset>(`SELECT path, alt, title FROM assets WHERE id IN (${videos})`)
   const iconPath = await all<Asset>(`SELECT path, alt, title FROM assets WHERE id IN (${icon})`)
+  const comments = await get<{ comment: string }>('SELECT comment FROM comments WHERE id=?', [d.comment])
 
   const list = `
 <div>
@@ -106,6 +108,11 @@ app.get('/game/:id', async (req, res) => {
 <div>
   <h4>视频</h4>
   <ul>${videosPath.map((t) => `<li><video src="/assets/${t.path}" controls></li></li>`).join('')}</ul>
+</div>
+
+<div>
+  <h4>评论</h4>
+  <div>id: ${JSON.stringify(comments)}</div>
 </div>
 `
   res.send(htmlTemplate(list))

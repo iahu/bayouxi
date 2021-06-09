@@ -24,7 +24,7 @@ export const uuid = (base = 0): number => {
 }
 
 export const getUuid =
-  (baseId = 100000) =>
+  (baseId = 0) =>
   (base = 0): number => {
     baseId = baseId + 1
     return base + baseId
