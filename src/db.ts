@@ -6,7 +6,8 @@ const PRODUCTION = process.env.NODE_ENV === 'production'
 const mainScript = process.argv[1]?.endsWith('index.ts')
 
 const sqlite3 = verbose()
-const dbName = PRODUCTION || !mainScript ? '233.db' : `233-${getDatetime()}.db`
+const ts = getDatetime().split(/\D/).slice(0, 4).join('.')
+const dbName = PRODUCTION || !mainScript ? '233.db' : `233-${ts}.db`
 const db = new sqlite3.Database(dbName)
 loo.info('use Database from', dbName)
 

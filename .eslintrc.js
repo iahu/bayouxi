@@ -20,14 +20,16 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['lib.js', 'kuaishou/*.js'],
+      files: ['dist/*.js'],
       rules: {
+        indent: ['warn', 4, { SwitchCase: 1 }],
         semi: 'off',
         quotes: 'off',
         'no-func-assign': 'off',
         '@typescript-eslint/no-empty-function': 'off',
         'no-global-assign': 'off',
         '@typescript-eslint/no-this-alias': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
       },
     },
   ],

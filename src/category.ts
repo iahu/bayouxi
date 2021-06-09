@@ -1,11 +1,11 @@
 import db, { all, run } from './db'
-import { getUuid } from './helper'
+import { getUid } from './helper'
 import loo from './loo'
 import parser from './parser'
 
 export type SubCategory = { id: number; name: string; link: string; cate_id: number; cate_name: string }
 
-const uuid = getUuid(0)
+const uid = getUid(0)
 
 const getCategory = async (): Promise<SubCategory[]> => {
   const rows = (await all('SELECT * FROM category_l2', [])) as unknown as SubCategory[]
@@ -42,7 +42,7 @@ const getCategory = async (): Promise<SubCategory[]> => {
           const name = a.attribs.title.trim()
           const link = a.attribs.href
           const cate_id = category[cate_name]
-          const id = uuid()
+          const id = uid()
 
           run('INSERT INTO category_l2 (id, name, link, cate_id, cate_name) VALUES (?, ?, ?, ?, ?)', [
             id,

@@ -3,7 +3,7 @@ import { Element } from 'cheerio'
 import Path from 'path'
 
 import { run } from './db'
-import { getUuid } from './helper'
+import { uuid } from './helper'
 import loo from './loo'
 import parser from './parser'
 
@@ -22,7 +22,6 @@ export type PageInfo = {
   app_author: string
 }
 
-const uuid = getUuid(0)
 const getPageInfo = async (url: string, cateId: number, subCateId: number): Promise<PageInfo> => {
   const $ = await parser(url)
   if (!$) {

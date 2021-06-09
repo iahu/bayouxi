@@ -1,4 +1,4 @@
-import { promisesThrottle } from './helper'
+import { promisesThrottle, useListHistory } from './helper'
 import getCategory from './category'
 import getPageInfo from './page'
 import loo from './loo'
@@ -8,10 +8,11 @@ const [startCateIndex = '0', startPageIndex = '0'] = process.argv.slice(2)
 const fromCateIndex = parseInt(startCateIndex) || 0
 const fromPageIndex = parseInt(startPageIndex) || 0
 
+type Job = () => Promise<number | void>
 const jobId = Date.now()
 
-type Job = () => Promise<number | void>
 const main = async (fromCateIndex: number, fromPageIndex: number) => {
+  const listHistory = await useListHistory()
   const subCategory = await getCategory()
   const cateLength = subCategory.length
 
@@ -22,22 +23,36 @@ const main = async (fromCateIndex: number, fromPageIndex: number) => {
       return
     }
 
-    listJobs.push(() => {
+    listJobs.push(async () => {
       loo.log('分类开始', `${cateIdx + 1}/${cateLength}`, subCate.cate_name)
-      return throughList(subCate.link, subCate.id, (pageLink, pageIdx) => {
-        if (pageIdx < fromPageIndex) {
-          return Promise.resolve(null)
-        }
-        // loo.log('获取游戏信息', `(${cateIdx + 1}/${cateLength}类, ${pageIdx + 1}个)[${pageLink}]`)
-        return getPageInfo(pageLink, subCate.cate_id, subCate.id)
-      }).then((r) => {
-        loo.log('分类结束', `${cateIdx + 1}/${cateLength}`, subCate.cate_name)
-        return r
+      const result = await throughList({
+        url: subCate.link,
+        subCateId: subCate.id,
+        before: (pageIdx) => {
+          const cacheIdx = listHistory[subCate.id] || 0
+          return pageIdx > cacheIdx
+        },
+        after: (pageLink, pageIdx) => {
+          if (pageIdx < fromPageIndex) {
+            return Promise.resolve(null)
+          }
+          // loo.log('获取游戏信息', `(${cateIdx + 1}/${cateLength}类, ${pageIdx + 1}个)[${pageLink}]`)
+          return getPageInfo(pageLink, subCate.cate_id, subCate.id)
+        },
+        done: (index: number) => {
+          listHistory[subCate.id] = index
+        },
       })
+
+      console.log('result', result)
+      if (result) {
+        loo.log('分类结束', `${cateIdx + 1}/${cateLength}`, subCate.cate_name)
+      }
+      return result
     })
   })
 
-  promisesThrottle(listJobs, 42).then(() => {
+  promisesThrottle(listJobs, 3).then(() => {
     loo.log('任务结束', jobId, '耗时', Date.now() - jobId)
   })
 }

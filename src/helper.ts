@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import Path from 'path'
+import loo from './loo'
 
 const memo = {} as Record<string, number>
 
@@ -17,11 +18,15 @@ export const ensureDirectoryExistence = (filePath: string): Promise<string> => {
     .finally(() => (memo[dirname] = 1))
 }
 
-export const getUuid = (baseId = 0) => {
+export const getUid = (baseId = 0) => {
   return (base = 0): number => {
     baseId = baseId + 1
     return base + baseId
   }
+}
+
+export const uuid = (seed = 10000000000): number => {
+  return Math.floor(Date.now() / (Math.random() * 100) + Math.random() * seed)
 }
 
 export const delay = (ms: number): Promise<number> => {
@@ -64,4 +69,54 @@ export const promisesThrottle = async <T>(
   }
 
   return result
+}
+
+export const beforeExit = (fn?: (exitCode: number) => Promise<unknown>): void => {
+  process.stdin.resume()
+  function exitHandler(exitCode: number) {
+    if (fn) {
+      fn(exitCode).then(() => process.exit())
+    } else {
+      process.exit()
+    }
+  }
+  //do something when app is closing
+  process.on('exit', exitHandler)
+
+  //catches ctrl+c event
+  process.on('SIGINT', exitHandler)
+
+  // catches "kill pid" (for example: nodemon restart)
+  process.on('SIGUSR1', exitHandler)
+  process.on('SIGUSR2', exitHandler)
+
+  //catches uncaught exceptions
+  process.on('uncaughtException', exitHandler)
+}
+
+type ListHistory = Record<number | string, number>
+export const useListHistory = async (): Promise<ListHistory> => {
+  const resumePath = Path.join(__dirname, '../resume.txt')
+
+  const resume = await fs.readFile(resumePath, 'utf8')
+  const listHistory = JSON.parse(resume || '{}')
+
+  beforeExit(() => {
+    const data = JSON.stringify(listHistory)
+    loo.log('save list history', data)
+    return fs.rm(resumePath).then(() => fs.writeFile(resumePath, data, { flag: 'w' }))
+  })
+
+  return listHistory
+}
+
+export const getNextListUrl = (url: string): string => {
+  const urlObj = new URL(url)
+  const urlList = urlObj.pathname.split('/').map((t) => t.split('.').shift())
+  const pageNum = urlList[3] || '1'
+  urlList[3] = +pageNum + 1 + '.html'
+
+  urlObj.pathname = urlList.join('/')
+
+  return urlObj.toString()
 }
