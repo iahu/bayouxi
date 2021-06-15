@@ -62,6 +62,9 @@ db.serialize(() => {
     title TEXT,
     link TEXT,
     page_link TEXT,
+    width INTEGER,
+    height INTEGER,
+    hue TEXT,
     done INTEGER
   )`)
 

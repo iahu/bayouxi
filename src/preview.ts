@@ -66,6 +66,7 @@ type Asset = {
   alt: string
   title: string
   path: string
+  hue?: string
 }
 
 app.get('/game/:id', async (req, res) => {
@@ -76,7 +77,7 @@ app.get('/game/:id', async (req, res) => {
   }
   const { images, videos, icon } = d
   const imagesPath = await all<Asset>(`SELECT path, alt, title FROM assets WHERE id IN (${images})`)
-  const videosPath = await all<Asset>(`SELECT path, alt, title FROM assets WHERE id IN (${videos})`)
+  const videosPath = await all<Asset>(`SELECT path, alt, title, hue FROM assets WHERE id IN (${videos})`)
   const iconPath = await all<Asset>(`SELECT path, alt, title FROM assets WHERE id IN (${icon})`)
   const comments = await get<{ comment: string }>('SELECT comment FROM comments WHERE id=?', [d.comment])
 
@@ -107,7 +108,9 @@ app.get('/game/:id', async (req, res) => {
 
 <div>
   <h4>视频</h4>
-  <ul>${videosPath.map((t) => `<li><video src="/assets/${t.path}" controls></li></li>`).join('')}</ul>
+  <ul>${videosPath
+    .map((t) => `<li style="background: #${t.hue}; padding: 10px"><video src="/assets/${t.path}" controls></li></li>`)
+    .join('')}</ul>
 </div>
 
 <div>
