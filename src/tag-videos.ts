@@ -6,7 +6,7 @@ import path from 'path'
 import { all, run } from './db'
 import ProHub from './prohub'
 
-const computeFrame = (pathToVideo: string): Promise<string> => {
+const captureFrame = (pathToVideo: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const folder = path.dirname(pathToVideo)
     const filename = path.basename(pathToVideo, path.extname(pathToVideo)) + '.png'
@@ -35,7 +35,7 @@ const getPixelAspect = (pathToVideo: string): Promise<{ width?: number; height?:
 }
 
 const getThumnailHue = (pathToVideo: string) =>
-  computeFrame(pathToVideo)
+  captureFrame(pathToVideo)
     .then(Jimp.read)
     .then((img) => img.scale(0.1))
     .then((img) => img.blur(40))
